@@ -1,3 +1,4 @@
+from __future__ import division
 import numpy as np 
 import pandas as pd 
 import sys
@@ -14,17 +15,20 @@ def predict(weight, sample):
         return 0
 
 def perceptron(X, Y, max_it=1):
-    weight = [0.0] * len(X[0])
     bias = 0.0
+    weights = []
+    weights.append([0.0] * len(X[0]))
 
     for it in range(max_it):
         for index in range(len(X)):
-            err = Y[index] - predict(weight, X[index])
+            err = Y[index] - predict(weights[-1], X[index])
             if err != 0:
                 bias += err
-                temp = zip(weight, X[index])
-                weight = [ t[0] + t[1] * err for t in temp]
-    return weight
+                temp = zip(weights[it], X[index])
+                weights.append([ t[0] + t[1] * err for t in temp])
+    print len(weights)   
+    return [sum(e)/len(e) for e in zip(*weights)]
+
 
 def zero_one_loss(pred, actual):
     n = len(actual)
@@ -99,6 +103,7 @@ def main():
     test_vals = test_X.as_matrix()
     
     w = perceptron(train_vals, train_Y, max_iteration)
+    #print w
 
     prediction = []
     for sample in test_vals:
