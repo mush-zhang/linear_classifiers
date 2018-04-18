@@ -3,7 +3,6 @@ import pandas as pd
 import sys
 import math
 from collections import Counter
-import random
 
 def predict(weight, sample):
     score = 0.0
