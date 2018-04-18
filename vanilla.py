@@ -27,6 +27,19 @@ def perceptron(X, Y, max_it=1):
                 weight = [ t[0] + t[1] * err for t in temp]
     return weight
 
+def zero_one_loss(pred, actual):
+    n = len(actual)
+
+    if len(pred) != n:
+        print 'something wrong'
+        return 'null'
+        
+    loss = 0
+    for pair in zip(pred, actual):
+        if pair[0] != pair[1]:
+            loss += 1
+    return loss / float(n)
+
 def main():
 
     """
@@ -91,8 +104,7 @@ def main():
     prediction = []
     for sample in test_vals:
         prediction.append(predict(w, sample))
-    
-    print prediction
-    print test_Y
+
+    print zero_one_loss(prediction, test_Y)
 
 if __name__ == "__main__": main()
