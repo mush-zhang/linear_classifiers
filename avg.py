@@ -1,33 +1,38 @@
-from __future__ import division
 import numpy as np 
 import pandas as pd 
 import sys
 import math
 from collections import Counter
+import time
 
-def predict(weight, sample):
-    score = 0.0
-    for pair in zip(weight, sample):
-        score += pair[0] * pair[1]
+start_time = time.time()
+
+def predict(weight, bias, sample):
+    score = np.sum(np.dot(weight, sample)) + bias #* len(sample)
     if score >= 0:
         return 1
     else:
         return 0
 
-def perceptron(X, Y, max_it=1):
+def perceptron(X, Y, max_it=2):
     bias = 0.0
-    weights = []
-    weights.append([0.0] * len(X[0]))
+    old_weights = [0.0] * len(X[0])
+    weight = [0.0] * len(X[0])
+
+    nT_rev = 1 / float(X.shape[0] * max_it)
+    step = float(X.shape[0] * max_it)
 
     for it in range(max_it):
-        for index in range(len(X)):
-            err = Y[index] - predict(weights[-1], X[index])
+        for index in range(X.shape[0]):
+            err = Y[index] - predict(weight, bias, X[index])
             if err != 0:
                 bias += err
-                temp = zip(weights[it], X[index])
-                weights.append([ t[0] + t[1] * err for t in temp])
-    print len(weights)   
-    return [sum(e)/len(e) for e in zip(*weights)]
+                bias *= step * nT_rev
+                weight = np.add(weight, np.multiply(X[index], err))
+                old_weights = np.add(old_weights, np.multiply(X[index], err * step * nT_rev))               
+            step -= 1
+
+    return old_weights, bias
 
 
 def zero_one_loss(pred, actual):
@@ -56,18 +61,20 @@ def main():
 
 
     # sanity checks
-    if len(sys.argv) < 4:
+    if len(sys.argv) < 3 or len(sys.argv) > 4:
         print 'wrong number of arguments'
         return
-
-    try:
-        max_iteration = int(sys.argv[3])
-    except ValueError:
-        print 'maximum iteration is not an integer'
-        return
-    if max_iteration < 0:
-        print 'max_iteration should be non negative'
-        return
+    if len(sys.argv) == 4:
+        try:
+            max_iteration = int(sys.argv[3])
+        except ValueError:
+            print 'maximum iteration is not an integer'
+            return
+        if max_iteration < 0:
+            print 'max_iteration should be non negative'
+            return
+    else:
+        max_iteration = 2
 
     # import data
     try:
@@ -88,7 +95,7 @@ def main():
 
     # concate train and test
     inter = pd.concat([raw_train_X, raw_test_X])
-    
+
     # transfrom to binary features
     inter_bi = pd.get_dummies(inter, columns=inter.columns.values)
 
@@ -102,12 +109,11 @@ def main():
     train_vals = train_X.as_matrix()
     test_vals = test_X.as_matrix()
     
-    w = perceptron(train_vals, train_Y, max_iteration)
-    #print w
+    w, b = perceptron(train_vals, train_Y, max_iteration)
 
     prediction = []
     for sample in test_vals:
-        prediction.append(predict(w, sample))
+        prediction.append(predict(w, b, sample))
 
     print zero_one_loss(prediction, test_Y)
 

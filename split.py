@@ -28,7 +28,7 @@ if perc < 0:
 
 # import data
 try:
-    raw = pd.read_csv(sys.argv[1], dtype=str ,sep=',', quotechar='"', header=0, engine='python') 
+    raw = pd.read_csv(sys.argv[1], sep=',', quotechar='"', header=0, engine='python') 
 except IOError: 
     print 'training file not found'
     sys.exit
@@ -40,5 +40,5 @@ sh_raw = raw.sample(frac=1).reset_index(drop=True)
 train_len = int(round(len(raw) * perc))
 
 # write to seperate files
-sh_raw.iloc[:train_len, :].to_csv('train.csv', sep=',')
-sh_raw.iloc[train_len:, :].to_csv('test.csv', sep=',')
+sh_raw[:train_len].to_csv('train.csv', sep=',', index=False)
+sh_raw[train_len:].to_csv('test.csv', sep=',', index=False)

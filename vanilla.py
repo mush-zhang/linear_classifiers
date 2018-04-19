@@ -3,28 +3,26 @@ import pandas as pd
 import sys
 import math
 from collections import Counter
+import time
+start_time = time.time()
 
-def predict(weight, sample):
-    score = 0.0
-    for pair in zip(weight, sample):
-        score += pair[0] * pair[1]
+def predict(weight, bias, sample):
+    score = np.sum(np.dot(weight, sample)) + bias #* len(sample)
     if score >= 0:
         return 1
     else:
         return 0
 
-def perceptron(X, Y, max_it=1):
+def perceptron(X, Y, max_it=2):
     weight = [0.0] * len(X[0])
     bias = 0.0
-
     for it in range(max_it):
-        for index in range(len(X)):
-            err = Y[index] - predict(weight, X[index])
+        for index in range(X.shape[0]):
+            err = Y[index] - predict(weight, bias, X[index])
             if err != 0:
                 bias += err
-                temp = zip(weight, X[index])
-                weight = [ t[0] + t[1] * err for t in temp]
-    return weight
+                weight = np.add(weight, np.multiply(X[index], err))
+    return weight, bias
 
 def zero_one_loss(pred, actual):
     n = len(actual)
@@ -52,18 +50,20 @@ def main():
 
 
     # sanity checks
-    if len(sys.argv) < 4:
+    if len(sys.argv) < 3 or len(sys.argv) > 4:
         print 'wrong number of arguments'
         return
-
-    try:
-        max_iteration = int(sys.argv[3])
-    except ValueError:
-        print 'maximum iteration is not an integer'
-        return
-    if max_iteration < 0:
-        print 'max_iteration should be non negative'
-        return
+    if len(sys.argv) == 4:
+        try:
+            max_iteration = int(sys.argv[3])
+        except ValueError:
+            print 'maximum iteration is not an integer'
+            return
+        if max_iteration < 0:
+            print 'max_iteration should be non negative'
+            return
+    else:
+        max_iteration = 2
 
     # import data
     try:
@@ -98,12 +98,20 @@ def main():
     train_vals = train_X.as_matrix()
     test_vals = test_X.as_matrix()
     
-    w = perceptron(train_vals, train_Y, max_iteration)
+    print("--- read data in %s seconds ---" % (time.time() - start_time))
+
+    w, b = perceptron(train_vals, train_Y, max_iteration)
+
+    print("--- perceptron in %s seconds ---" % (time.time() - start_time))
 
     prediction = []
     for sample in test_vals:
-        prediction.append(predict(w, sample))
+        prediction.append(predict(w, b, sample))
+
+    print("--- predict in %s seconds ---" % (time.time() - start_time))
 
     print zero_one_loss(prediction, test_Y)
+
+    print("--- calculate loss in %s seconds ---" % (time.time() - start_time))
 
 if __name__ == "__main__": main()
