@@ -3,9 +3,6 @@ import pandas as pd
 import sys
 import math
 from collections import Counter
-import time
-
-start_time = time.time()
 
 def predict(weight, bias, sample):
     score = np.sum(np.dot(weight, sample)) + bias #* len(sample)
