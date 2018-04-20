@@ -3,8 +3,6 @@ import pandas as pd
 import sys
 import math
 from collections import Counter
-import time
-start_time = time.time()
 
 def predict(weight, bias, sample):
     score = np.sum(np.dot(weight, sample)) + bias #* len(sample)
@@ -98,20 +96,12 @@ def main():
     train_vals = train_X.as_matrix()
     test_vals = test_X.as_matrix()
     
-    print("--- read data in %s seconds ---" % (time.time() - start_time))
-
     w, b = perceptron(train_vals, train_Y, max_iteration)
-
-    print("--- perceptron in %s seconds ---" % (time.time() - start_time))
 
     prediction = []
     for sample in test_vals:
         prediction.append(predict(w, b, sample))
 
-    print("--- predict in %s seconds ---" % (time.time() - start_time))
-
-    print zero_one_loss(prediction, test_Y)
-
-    print("--- calculate loss in %s seconds ---" % (time.time() - start_time))
+    print 'ZERO-ONE LOSS=%f' % (zero_one_loss(prediction, test_Y))
 
 if __name__ == "__main__": main()

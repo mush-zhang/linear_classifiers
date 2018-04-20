@@ -17,23 +17,7 @@ def zero_one_loss(pred, actual):
             loss += 1
     return loss / float(n)
 
-def predict(weight, bias, sample):
-    score = np.sum(np.dot(weight, sample)) + bias #* len(sample)
-    if score >= 0:
-        return 1
-    else:
-        return 0
-
 def main():
-
-    """
-    argv[0]: program name
-    argv[1]: training file
-    argv[2]: test file
-    Fetaures: Consider the first 14 discrete attributes in yelp_cat.csv for X.
-    Class label: Consider the attribute goodForGroups as the class label, i.e., Y = {0, 1}.
-    """
-
 
     # sanity checks
     if len(sys.argv) < 3:

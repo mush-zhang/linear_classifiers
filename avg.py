@@ -112,6 +112,6 @@ def main():
     for sample in test_vals:
         prediction.append(predict(w, b, sample))
 
-    print zero_one_loss(prediction, test_Y)
+    print 'ZERO-ONE LOSS=%f' % (zero_one_loss(prediction, test_Y))
 
 if __name__ == "__main__": main()
