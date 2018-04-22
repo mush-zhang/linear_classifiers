@@ -5,7 +5,7 @@ import math
 from collections import Counter
 
 def predict(weight, bias, sample):
-    score = np.sum(np.dot(weight, sample)) + bias #* len(sample)
+    score = np.sum(np.dot(weight, sample)) + bias 
     if score >= 0:
         return 1
     else:
@@ -13,6 +13,7 @@ def predict(weight, bias, sample):
 
 def perceptron(X, Y, max_it=2):
     bias = 0.0
+    old_bias = 0.0
     old_weights = [0.0] * len(X[0])
     weight = [0.0] * len(X[0])
 
@@ -24,12 +25,12 @@ def perceptron(X, Y, max_it=2):
             err = Y[index] - predict(weight, bias, X[index])
             if err != 0:
                 bias += err
-                bias *= step * nT_rev
+                old_bias = old_bias + err * step * nT_rev
                 weight = np.add(weight, np.multiply(X[index], err))
                 old_weights = np.add(old_weights, np.multiply(X[index], err * step * nT_rev))               
             step -= 1
 
-    return old_weights, bias
+    return old_weights, old_bias
 
 
 def zero_one_loss(pred, actual):

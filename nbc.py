@@ -117,7 +117,6 @@ def main():
     a, b, c, d = nb(pos, neg)
     prediction = predict(a, b, c, d, test_X)
 
-    print zero_one_loss(prediction, test_Y)
+    print 'ZERO-ONE LOSS=%f' % (zero_one_loss(prediction, test_Y))
     
-
 if __name__ == "__main__": main()
